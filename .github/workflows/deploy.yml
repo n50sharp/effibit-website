@@ -6,10 +6,19 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  trigger-netlify-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Netlify build hook
-        run: |
-          curl -s -X POST "${{ secrets.NETLIFY_BUILD_HOOK_URL }}"
-          echo "Netlify deploy triggered for effibit-technologies.netlify.app"
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: '.'
+          production-branch: main
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions: ${{ github.sha }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
